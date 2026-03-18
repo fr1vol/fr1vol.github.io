@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="问题背景使用 Claude Code 开发时，你是否遇到过这样的困扰： 当你把一个项目目录移动到新位置（比如从 &#x2F;home&#x2F;user&#x2F;old&#x2F;project 移动到 &#x2F;home&#x2F;user&#x2F;new&#x2F;project），重新打开 Claude 后，它完全不认识这个项目了——所有的对话历史、上下文记忆都找不到了。 这是因为 Claude Code 用路径作为项目标识符： 12旧路径: &#x2F;home&#x2F;user">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TermKeeper：解决 Claude Code 项目移动后的失忆问题">
+<meta property="og:url" content="http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="问题背景使用 Claude Code 开发时，你是否遇到过这样的困扰： 当你把一个项目目录移动到新位置（比如从 &#x2F;home&#x2F;user&#x2F;old&#x2F;project 移动到 &#x2F;home&#x2F;user&#x2F;new&#x2F;project），重新打开 Claude 后，它完全不认识这个项目了——所有的对话历史、上下文记忆都找不到了。 这是因为 Claude Code 用路径作为项目标识符： 12旧路径: &#x2F;home&#x2F;user">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-03-18T16:31:13.418Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Claude-Code">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>TermKeeper：解决 Claude Code 项目移动后的失忆问题</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/fr1vol">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2026/03/19/C++%E7%9A%84%E5%B9%B3%E5%87%A1%E6%80%A7/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&text=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&is_video=false&description=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=TermKeeper：解决 Claude Code 项目移动后的失忆问题&body=Check out this article: http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&name=TermKeeper：解决 Claude Code 项目移动后的失忆问题&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&t=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9ATermKeeper"><span class="toc-number">2.</span> <span class="toc-text">解决方案：TermKeeper</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD"><span class="toc-number">2.1.</span> <span class="toc-text">核心功能</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B"><span class="toc-number">3.</span> <span class="toc-text">快速上手</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-number">3.1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">3.2.</span> <span class="toc-text">使用场景</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86"><span class="toc-number">4.</span> <span class="toc-text">技术原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Slug-%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99"><span class="toc-number">4.1.</span> <span class="toc-text">Slug 转换规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%81%E7%A7%BB%E6%9C%AC%E8%B4%A8"><span class="toc-number">4.2.</span> <span class="toc-text">迁移本质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%99%BA%E8%83%BD%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="toc-number">4.3.</span> <span class="toc-text">智能匹配算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A2%9E%E9%87%8F%E5%BD%92%E6%A1%A3"><span class="toc-number">4.4.</span> <span class="toc-text">增量归档</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%89%B9%E7%82%B9"><span class="toc-number">5.</span> <span class="toc-text">项目特点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E7%89%87%E6%AE%B5"><span class="toc-number">6.</span> <span class="toc-text">代码片段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        TermKeeper：解决 Claude Code 项目移动后的失忆问题
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">John Doe</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2026-03-18T16:00:00.000Z" class="dt-published" itemprop="datePublished">2026-03-19</time>
+        
+      
+    </div>
+
+
+      
+    <div class="article-category">
+        <i class="fa-solid fa-archive"></i>
+        <a class="category-link" href="/categories/%E5%B7%A5%E5%85%B7/">工具</a>
+    </div>
+
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Claude-Code/" rel="tag">Claude-Code</a>, <a class="p-category" href="/tags/Python/" rel="tag">Python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <h2 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h2><p>使用 Claude Code 开发时，你是否遇到过这样的困扰：</p>
+<p>当你把一个项目目录移动到新位置（比如从 <code>/home/user/old/project</code> 移动到 <code>/home/user/new/project</code>），重新打开 Claude 后，它完全不认识这个项目了——所有的对话历史、上下文记忆都找不到了。</p>
+<p>这是因为 Claude Code 用<strong>路径</strong>作为项目标识符：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">旧路径: /home/user/old/project  → slug: -home-user-old-project</span><br><span class="line">新路径: /home/user/new/project  → slug: -home-user-new-project</span><br></pre></td></tr></table></figure>
+
+<p>虽然内容没变，但路径变了，Claude 就认为这是一个全新的项目。</p>
+<h2 id="解决方案：TermKeeper"><a href="#解决方案：TermKeeper" class="headerlink" title="解决方案：TermKeeper"></a>解决方案：TermKeeper</h2><p>TermKeeper (tk) 是一个专门解决这个问题的工具，通过重命名 Claude 的项目目录来恢复记忆。</p>
+<h3 id="核心功能"><a href="#核心功能" class="headerlink" title="核心功能"></a>核心功能</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>tk .</code> 或 <code>tk -m</code></td>
+<td>自动迁移（智能检测最佳匹配）</td>
+</tr>
+<tr>
+<td><code>tk -m &lt;path&gt;</code></td>
+<td>显式迁移（直接指定旧路径）</td>
+</tr>
+<tr>
+<td><code>tk migrate</code></td>
+<td>交互式迁移（列出所有项目）</td>
+</tr>
+<tr>
+<td><code>tk -a</code></td>
+<td>归档会话（JSONL 转 Markdown）</td>
+</tr>
+</tbody></table>
+<h2 id="快速上手"><a href="#快速上手" class="headerlink" title="快速上手"></a>快速上手</h2><h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/fr1vol/termkeeper.git</span><br><span class="line"><span class="built_in">cd</span> termkeeper</span><br><span class="line"><span class="built_in">chmod</span> +x tk.py</span><br><span class="line"><span class="built_in">sudo</span> <span class="built_in">ln</span> -s $(<span class="built_in">pwd</span>)/tk.py /usr/local/bin/tk</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h3><p><strong>场景一：自动迁移</strong></p>
+<p>移动项目后，在新目录直接运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /new/project/path</span><br><span class="line">tk .</span><br></pre></td></tr></table></figure>
+
+<p>自动检测并迁移旧项目的记忆：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">当前目录: /home/rubick/termkeeper</span><br><span class="line">未找到对应的 Claude 数据，尝试自动迁移...</span><br><span class="line"></span><br><span class="line">找到 1 个可能匹配的项目:</span><br><span class="line">  [1] -home-old-termkeeper (匹配度: 100)</span><br><span class="line"></span><br><span class="line">✓ 记忆搬家完成</span><br></pre></td></tr></table></figure>
+
+<p><strong>场景二：显式迁移</strong></p>
+<p>如果你知道旧路径，可以直接指定：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tk -m /home/old/project</span><br></pre></td></tr></table></figure>
+
+<p><strong>场景三：归档会话</strong></p>
+<p>将 Claude 的 JSONL 会话转换为可读的 Markdown：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tk -a</span><br></pre></td></tr></table></figure>
+
+<p>归档文件包含完整对话记录，并基于 SHA256 hash 实现增量更新。</p>
+<h2 id="技术原理"><a href="#技术原理" class="headerlink" title="技术原理"></a>技术原理</h2><h3 id="Slug-转换规则"><a href="#Slug-转换规则" class="headerlink" title="Slug 转换规则"></a>Slug 转换规则</h3><p>Claude Code 将路径转换为 slug 作为项目 ID：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/rubick/termkeeper  →  -home-rubick-termkeeper</span><br></pre></td></tr></table></figure>
+
+<p>规则：将 <code>/</code> 替换为 <code>-</code>，保留前导 <code>-</code>。</p>
+<h3 id="迁移本质"><a href="#迁移本质" class="headerlink" title="迁移本质"></a>迁移本质</h3><p>移动项目目录本质是重命名 Claude 的项目目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">~/.claude/projects/-home-old-termkeeper/</span><br><span class="line">  → ~/.claude/projects/-home-rubick-termkeeper/</span><br></pre></td></tr></table></figure>
+
+<h3 id="智能匹配算法"><a href="#智能匹配算法" class="headerlink" title="智能匹配算法"></a>智能匹配算法</h3><p><code>tk .</code> 使用多维度评分自动找到旧项目：</p>
+<table>
+<thead>
+<tr>
+<th>匹配条件</th>
+<th>分数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>目录名完全匹配</td>
+<td>+100</td>
+</tr>
+<tr>
+<td>目录名部分匹配</td>
+<td>+50</td>
+</tr>
+<tr>
+<td>归档包含当前路径</td>
+<td>+80</td>
+</tr>
+<tr>
+<td>归档包含当前 slug</td>
+<td>+60</td>
+</tr>
+<tr>
+<td>归档包含目录名</td>
+<td>+30</td>
+</tr>
+</tbody></table>
+<h3 id="增量归档"><a href="#增量归档" class="headerlink" title="增量归档"></a>增量归档</h3><p>基于 SHA256 hash 检测文件变更，避免重复处理：</p>
+<ol>
+<li>计算源 JSONL 文件的 SHA256</li>
+<li>读取现有归档的 <code>source_hash</code></li>
+<li>hash 相同 → 跳过</li>
+<li>hash 不同 → 更新归档</li>
+</ol>
+<h2 id="项目特点"><a href="#项目特点" class="headerlink" title="项目特点"></a>项目特点</h2><ul>
+<li><strong>零依赖</strong>：仅使用 Python 标准库</li>
+<li><strong>极简</strong>：单文件，约 600 行代码</li>
+<li><strong>可靠</strong>：基于 hash 检测，比 mtime 更准确</li>
+<li><strong>开源</strong>：MIT License</li>
+</ul>
+<h2 id="代码片段"><a href="#代码片段" class="headerlink" title="代码片段"></a>代码片段</h2><p>归档文件格式示例：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 📔 rubick会话</span></span><br><span class="line"></span><br><span class="line">---</span><br><span class="line">date: 2026-03-18</span><br><span class="line">project: rubick</span><br><span class="line">session<span class="emphasis">_id: a1f0c813-6f49-40e4-bfbd-b24cb090cce7</span></span><br><span class="line"><span class="emphasis">last_</span>updated: 2026-03-18 01:40</span><br><span class="line">project<span class="emphasis">_path: /home/rubick/termkeeper</span></span><br><span class="line"><span class="emphasis">source_</span>hash: a3d5f9e2b1c4...  ← SHA256 hash</span><br><span class="line">---</span><br><span class="line"></span><br><span class="line"><span class="section">## 对话记录</span></span><br><span class="line"></span><br><span class="line"><span class="section">### User</span></span><br><span class="line">请帮我优化这段代码...</span><br><span class="line"></span><br><span class="line"><span class="section">### Assistant</span></span><br><span class="line">我来帮你分析...</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>TermKeeper 解决了一个具体的痛点：Claude Code 项目移动后的失忆问题。如果你经常重组项目目录结构，这个工具会让你省去很多麻烦。</p>
+<p>项目地址：<a target="_blank" rel="noopener" href="https://github.com/fr1vol/termkeeper">https://github.com/fr1vol/termkeeper</a></p>
+<hr>
+<p><em>发布日期：2026-03-19</em></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/about/">关于</a></li>
+        
+          <li><a href="/archives/">归档</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/fr1vol">项目</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">问题背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9ATermKeeper"><span class="toc-number">2.</span> <span class="toc-text">解决方案：TermKeeper</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD"><span class="toc-number">2.1.</span> <span class="toc-text">核心功能</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B"><span class="toc-number">3.</span> <span class="toc-text">快速上手</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-number">3.1.</span> <span class="toc-text">安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="toc-number">3.2.</span> <span class="toc-text">使用场景</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86"><span class="toc-number">4.</span> <span class="toc-text">技术原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Slug-%E8%BD%AC%E6%8D%A2%E8%A7%84%E5%88%99"><span class="toc-number">4.1.</span> <span class="toc-text">Slug 转换规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%81%E7%A7%BB%E6%9C%AC%E8%B4%A8"><span class="toc-number">4.2.</span> <span class="toc-text">迁移本质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%99%BA%E8%83%BD%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="toc-number">4.3.</span> <span class="toc-text">智能匹配算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A2%9E%E9%87%8F%E5%BD%92%E6%A1%A3"><span class="toc-number">4.4.</span> <span class="toc-text">增量归档</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%89%B9%E7%82%B9"><span class="toc-number">5.</span> <span class="toc-text">项目特点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E7%89%87%E6%AE%B5"><span class="toc-number">6.</span> <span class="toc-text">代码片段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">7.</span> <span class="toc-text">总结</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&text=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&is_video=false&description=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=TermKeeper：解决 Claude Code 项目移动后的失忆问题&body=Check out this article: http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&title=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&name=TermKeeper：解决 Claude Code 项目移动后的失忆问题&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2026/03/19/termkeeper-claude-code-%E9%A1%B9%E7%9B%AE%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/&t=TermKeeper：解决 Claude Code 项目移动后的失忆问题"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2026
+    John Doe
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/about/">关于</a></li><!--
+     --><!--
+       --><li><a href="/archives/">归档</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/fr1vol">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
